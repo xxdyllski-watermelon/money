@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#FBF9FA">
+<title>DYLL BINDER — Catatan & Keuangan</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="app">
+
+<header>
+<h1>📔 DYLL BINDER</h1>
+<nav class="tabs" role="tablist">
+<button class="tab-btn active" data-tab="notes" role="tab">Catatan</button>
+<button class="tab-btn" data-tab="finance" role="tab">Keuangan</button>
+<button class="tab-btn" data-tab="pomodoro" role="tab">Pomodoro</button>
+</nav>
+<span class="spacer"></span>
+<div class="clock">
+<span id="clockTime" class="clock__time d-full">--:--:--</span>
+<span id="clockDateFull" class="clock__date d-full"></span>
+<span id="clockDateShort" class="clock__date d-short"></span>
+</div>
+<button id="btnSettings" class="icon-btn" aria-label="Pengaturan" title="Pengaturan">⚙</button>
+</header>
+
+<main>
+
+<!-- ===== CATATAN ===== -->
+<section id="panel-notes" class="panel active" role="tabpanel">
+<aside class="notes-side">
+<div class="notes-side__top">
+<input id="searchInput" type="search" placeholder="Cari catatan…" autocomplete="off">
+<button id="btnNewNote" class="btn-add" aria-label="Catatan baru" title="Catatan baru">+</button>
+</div>
+<div id="noteList" class="note-list"></div>
+</aside>
+<article id="noteForm" class="note-edit" style="display:none;">
+<div class="note-edit__bar">
+<span id="noteMeta" class="muted"></span>
+<button id="btnDeleteNote" class="icon-btn sm" aria-label="Hapus catatan" title="Hapus">🗑</button>
+</div>
+<input id="noteTitle" class="title" type="text" placeholder="Judul…">
+<textarea id="noteContent" placeholder="Ketik di sini…"></textarea>
+<div class="tag-bar" id="tagBar"></div>
+</article>
+<p id="noteEmpty" class="note-edit__empty">Pilih catatan, atau tekan "+" untuk membuat yang baru.</p>
+</section>
+
+<!-- ===== KEUANGAN ===== -->
+<section id="panel-finance" class="panel" role="tabpanel">
+<div class="fin-summary">
+<div class="fin-card balance"><span class="fin-card__label">Saldo</span><strong id="statBalance" class="fin-card__val">Rp 0</strong></div>
+<div class="fin-card income"><span class="fin-card__label">Pemasukan</span><strong id="statIncome" class="fin-card__val">Rp 0</strong></div>
+<div class="fin-card expense"><span class="fin-card__label">Pengeluaran</span><strong id="statExpense" class="fin-card__val">Rp 0</strong></div>
+</div>
+
+<div class="budget-section glass-card">
+<div class="budget-header">
+<strong>Budget Bulanan</strong>
+<div class="budget-set">
+<select id="budgetMonth"></select>
+<input id="budgetAmount" type="number" min="0" step="50000" placeholder="Misal: 2000000">
+<button id="btnSaveBudget" class="btn-sm">Simpan</button>
+</div>
+</div>
+<div class="budget-progress-wrap">
+<div class="budget-bar-bg"><div id="budgetBar" class="budget-bar-fill"></div></div>
+<span id="budgetInfo" class="budget-info">Belum diatur</span>
+</div>
+</div>
+
+<div class="chart-section glass-card">
+<div class="chart-tabs">
+<button class="chart-tab active" data-chart="daily">Harian</button>
+<button class="chart-tab" data-chart="category">Per Kategori</button>
+</div>
+<canvas id="finChart" height="160"></canvas>
+</div>
+
+<form id="txForm" class="fin-form glass-card">
+<input name="type" value="expense" hidden>
+<label class="sr-only">Tipe</label>
+<select name="type">
+<option value="expense">Keluar</option>
+<option value="income">Masuk</option>
+</select>
+<select name="category">
+<option>Makanan</option><option>Transportasi</option><option>Kuliah</option>
+<option>Belanja</option><option>Hiburan</option><option>Lainnya</option>
+</select>
+<input name="desc" type="text" placeholder="Deskripsi…">
+<input name="amount" type="number" placeholder="Jumlah" min="1" required>
+<button type="submit">Tambahkan</button>
+</form>
+<div id="txList"></div>
+</section>
+
+<!-- ===== POMODORO ===== -->
+<section id="panel-pomodoro" class="panel" role="tabpanel">
+<div class="pomo-container glass-card">
+<h2>Fokus Pomodoro 🍅</h2>
+<div class="pomo-ring-wrap">
+<svg class="pomo-ring" viewBox="0 0 200 200">
+<circle cx="100" cy="100" r="88" fill="none" stroke="var(--line)" stroke-width="10"/>
+<circle id="pomoRing" cx="100" cy="100" r="88" fill="none" stroke="var(--accent)" stroke-width="10"
+stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="0"
+transform="rotate(-90 100 100)"/>
+</svg>
+<div class="pomo-time-display" id="pomoDisplay">25:00</div>
+</div>
+<div class="pomo-mode-switch">
+<button class="pomo-mode-btn active" data-minutes="25" data-type="work">Fokus 25′</button>
+<button class="pomo-mode-btn" data-minutes="5" data-type="short">Istirahat 5′</button>
+<button class="pomo-mode-btn" data-minutes="15" data-type="long">Panjang 15′</button>
+</div>
+<div class="pomo-controls">
+<button id="pomoStartPause" class="btn-primary-lg">▶ Mulai</button>
+<button id="pomoReset" class="btn-secondary-lg">↺ Reset</button>
+</div>
+<div class="pomo-stats">
+<span>Sesi selesai hari ini: <strong id="pomoCount">0</strong></span>
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- Popover Pengaturan -->
+<div id="settingsPop" class="settings-pop">
+<h4>Tampilan</h4>
+<div class="swatch-row" id="accentSwatches"></div>
+<div class="row"><span>Warna aksen kustom</span><input id="accentCustom" type="color"></div>
+<div class="row"><span>Warna teks</span><input id="textCustom" type="color"></div>
+<h4>Tema</h4>
+<div class="theme-switch">
+<button data-theme="light" class="active">☀ Terang</button>
+<button data-theme="dark">☾ Gelap</button>
+</div>
+<h4>Data</h4>
+<div class="data-row">
+<button id="btnExport">Ekspor</button>
+<label class="data-label">Impor<input id="importFile" type="file" accept=".json" hidden></label>
+<button id="btnReset">Hapus semua</button>
+</div>
+<p class="hint">Semua data tersimpan lokal di perangkat Anda.</p>
+</div>
+
+<div id="installBox" class="install-box" hidden>
+<span>Aplikasi tersedia untuk dipasang!</span>
+<button id="btnInstall">⬇ Instal</button>
+</div>
+<div id="iosHint" class="ios-hint" hidden>
+Buka menu Bagikan di Safari → "Tambah ke Layar Utama".
+</div>
+
+<noscript>Aplikasi ini membutuhkan JavaScript.</noscript>
+<script src="./script.js"></script>
+</body>
+</html>
